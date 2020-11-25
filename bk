@@ -1,0 +1,123 @@
+Jerry Yang 005384352
+Assignment 7 - Lab Questions
+
+1) Basic setup
+wget https://web.cs.ucla.edu/classes/fall20/cs35L/assign/simpgmp.c
+gcc simgmp.c -o simpgmp -lgmp 
+
+2) 2**24
+./simpgmp 24
+16777216
+
+./simpgmp 16777216 > num.txt
+It does start with 1818 and end with 7536
+
+wc num.txt
+      1       1 5050447 num.txt
+Has 5,050,446 decimal places.
+
+3) ldd ./simpgmp
+        linux-vdso.so.1 =>  (0x00007ffd990ed000)
+        libgmp.so.10 => /lib64/libgmp.so.10 (0x00007f603dadc000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007f603d70e000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f603dd54000)
+
+4) strace ./simpgmp
+execve("./simpgmp", ["./simpgmp"], 0x7ffc0cc001a0 /* 37 vars */) = 0
+brk(NULL)                               = 0xf5b000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fc394d8d000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=160424, ...}) = 0
+mmap(NULL, 160424, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fc394d65000
+close(3)                                = 0
+open("/lib64/libgmp.so.10", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200\304\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=495720, ...}) = 0
+mmap(NULL, 2584736, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fc3948f5000
+mprotect(0x7fc39496b000, 2093056, PROT_NONE) = 0
+mmap(0x7fc394b6a000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x75000) = 0x7fc394b6a000
+close(3)                                = 0
+open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`&\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2156240, ...}) = 0
+mmap(NULL, 3985920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fc394527000
+mprotect(0x7fc3946ea000, 2097152, PROT_NONE) = 0
+mmap(0x7fc3948ea000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c3000) = 0x7fc3948ea000
+mmap(0x7fc3948f0000, 16896, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fc3948f0000
+close(3)                                = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fc394d64000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fc394d62000
+arch_prctl(ARCH_SET_FS, 0x7fc394d62740) = 0
+mprotect(0x7fc3948ea000, 16384, PROT_READ) = 0
+mprotect(0x7fc394b6a000, 8192, PROT_READ) = 0
+mprotect(0x600000, 4096, PROT_READ)     = 0
+mprotect(0x7fc394d8e000, 4096, PROT_READ) = 0
+munmap(0x7fc394d65000, 160424)          = 0
+write(2, "./simpgmp: usage: ./simpgmp expo"..., 37./simpgmp: usage: ./simpgmp exponent
+) = 37
+exit_group(1)                           = ?
++++ exited with 1 +++
+
+Calls related to Dynamic Linking:
+//These 3 are used to load ld.so
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=160424, ...}) = 0
+mmap(NULL, 160424, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f4fc0552000
+close(3) 
+
+//Similarly, loading libc.so.10 and libc.so.6
+open("/lib64/libgmp.so.10", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200\304\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=495720, ...}) = 0
+mmap(NULL, 2584736, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f4fc00e2000
+mprotect(0x7f4fc0158000, 2093056, PROT_NONE) = 0
+mmap(0x7f4fc0357000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x75000) = 0x7f4fc0357000
+close(3)
+
+open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`&\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2156240, ...}) = 0
+mmap(NULL, 3985920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f4fbfd14000
+mprotect(0x7f4fbfed7000, 2097152, PROT_NONE) = 0
+mmap(0x7f4fc00d7000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c3000) = 0x7f4fc00d7000
+mmap(0x7f4fc00dd000, 16896, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f4fc00dd000
+close(3)  
+
+//Write output
+write(2, "./simpgmp: usage: ./simpgmp expo"..., 37./simpgmp: usage: ./simpgmp exponent) = 37
+
+// Open = open the targeted libraries that will be dynamically linked
+   Read = reads data about the library
+   Close = close after dynamc linking is finished
+   fstat = returns size of library so proper amount of memory is mapped using mmap
+   mmap = maps virtual address space of process that calls it
+   mprotect = protects mapped space of mmap
+
+5)List of commands
+ls /usr/bin | awk '(NR-005384352)%251 == 0'
+blkrawverify
+dir
+gio-querymodules-64
+idn
+lastlog
+nenscript
+pamtowinicon
+pmlogsize
+readelf
+ssh
+wc
+
+6) ldd
+ldd /usr/bin/blkrawverify > libused.txt
+ldd /usr/bin/dir >> libused.txt
+...
+ldd /usr/bin/wc >> libused.txt
+
+Run ldd /usr/bin/. for each of the 9~ commands. Append them all to libused.txt
+
+7) Unique sorted list of dynamic libraries 
+cat libused.txt | grep so > unilib.txt
+sed 's| (.*)||g' unilib.txt | sort -u > unique.txt
+cat unique.txt >> lab.txt
