@@ -1,0 +1,186 @@
+Jerry Yang 005384352
+Assignment 7 - Lab Questions
+
+1) Basic setup
+wget https://web.cs.ucla.edu/classes/fall20/cs35L/assign/simpgmp.c
+gcc simgmp.c -o simpgmp -lgmp 
+
+2) 2**24
+./simpgmp 24
+16777216
+
+./simpgmp 16777216 > num.txt
+It does start with 1818 and end with 7536
+
+wc num.txt
+      1       1 5050447 num.txt
+Has 5,050,446 decimal places.
+
+3) ldd ./simpgmp
+        linux-vdso.so.1 =>  (0x00007ffd990ed000)
+        libgmp.so.10 => /lib64/libgmp.so.10 (0x00007f603dadc000)
+        libc.so.6 => /lib64/libc.so.6 (0x00007f603d70e000)
+        /lib64/ld-linux-x86-64.so.2 (0x00007f603dd54000)
+
+4) strace ./simpgmp
+execve("./simpgmp", ["./simpgmp"], 0x7ffc0cc001a0 /* 37 vars */) = 0
+brk(NULL)                               = 0xf5b000
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fc394d8d000
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=160424, ...}) = 0
+mmap(NULL, 160424, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7fc394d65000
+close(3)                                = 0
+open("/lib64/libgmp.so.10", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200\304\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=495720, ...}) = 0
+mmap(NULL, 2584736, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fc3948f5000
+mprotect(0x7fc39496b000, 2093056, PROT_NONE) = 0
+mmap(0x7fc394b6a000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x75000) = 0x7fc394b6a000
+close(3)                                = 0
+open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`&\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2156240, ...}) = 0
+mmap(NULL, 3985920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7fc394527000
+mprotect(0x7fc3946ea000, 2097152, PROT_NONE) = 0
+mmap(0x7fc3948ea000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c3000) = 0x7fc3948ea000
+mmap(0x7fc3948f0000, 16896, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7fc3948f0000
+close(3)                                = 0
+mmap(NULL, 4096, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fc394d64000
+mmap(NULL, 8192, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_ANONYMOUS, -1, 0) = 0x7fc394d62000
+arch_prctl(ARCH_SET_FS, 0x7fc394d62740) = 0
+mprotect(0x7fc3948ea000, 16384, PROT_READ) = 0
+mprotect(0x7fc394b6a000, 8192, PROT_READ) = 0
+mprotect(0x600000, 4096, PROT_READ)     = 0
+mprotect(0x7fc394d8e000, 4096, PROT_READ) = 0
+munmap(0x7fc394d65000, 160424)          = 0
+write(2, "./simpgmp: usage: ./simpgmp expo"..., 37./simpgmp: usage: ./simpgmp exponent
+) = 37
+exit_group(1)                           = ?
++++ exited with 1 +++
+
+Calls related to Dynamic Linking:
+//These 3 are used to load ld.so
+access("/etc/ld.so.preload", R_OK)      = -1 ENOENT (No such file or directory)
+open("/etc/ld.so.cache", O_RDONLY|O_CLOEXEC) = 3
+fstat(3, {st_mode=S_IFREG|0644, st_size=160424, ...}) = 0
+mmap(NULL, 160424, PROT_READ, MAP_PRIVATE, 3, 0) = 0x7f4fc0552000
+close(3) 
+
+//Similarly, loading libc.so.10 and libc.so.6
+open("/lib64/libgmp.so.10", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\0\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0\200\304\0\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=495720, ...}) = 0
+mmap(NULL, 2584736, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f4fc00e2000
+mprotect(0x7f4fc0158000, 2093056, PROT_NONE) = 0
+mmap(0x7f4fc0357000, 12288, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x75000) = 0x7f4fc0357000
+close(3)
+
+open("/lib64/libc.so.6", O_RDONLY|O_CLOEXEC) = 3
+read(3, "\177ELF\2\1\1\3\0\0\0\0\0\0\0\0\3\0>\0\1\0\0\0`&\2\0\0\0\0\0"..., 832) = 832
+fstat(3, {st_mode=S_IFREG|0755, st_size=2156240, ...}) = 0
+mmap(NULL, 3985920, PROT_READ|PROT_EXEC, MAP_PRIVATE|MAP_DENYWRITE, 3, 0) = 0x7f4fbfd14000
+mprotect(0x7f4fbfed7000, 2097152, PROT_NONE) = 0
+mmap(0x7f4fc00d7000, 24576, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_DENYWRITE, 3, 0x1c3000) = 0x7f4fc00d7000
+mmap(0x7f4fc00dd000, 16896, PROT_READ|PROT_WRITE, MAP_PRIVATE|MAP_FIXED|MAP_ANONYMOUS, -1, 0) = 0x7f4fc00dd000
+close(3)  
+
+//Write output
+write(2, "./simpgmp: usage: ./simpgmp expo"..., 37./simpgmp: usage: ./simpgmp exponent) = 37
+
+// Open = open the targeted libraries that will be dynamically linked
+   Read = reads data about the library
+   Close = close after dynamc linking is finished
+   fstat = returns size of library so proper amount of memory is mapped using mmap
+   mmap = maps virtual address space of process that calls it
+   mprotect = protects mapped space of mmap
+
+5)List of commands
+ls /usr/bin | awk '(NR-005384352)%251 == 0'
+blkrawverify
+dir
+gio-querymodules-64
+idn
+lastlog
+nenscript
+pamtowinicon
+pmlogsize
+readelf
+ssh
+wc
+
+6) ldd
+ldd /usr/bin/blkrawverify > libused.txt
+ldd /usr/bin/dir >> libused.txt
+...
+ldd /usr/bin/wc >> libused.txt
+
+Run ldd /usr/bin/. for each of the 9~ commands. Append them all to libused.txt
+
+7) Unique sorted list of dynamic libraries 
+cat libused.txt | grep so > unilib.txt
+sed 's| (.*)||g' unilib.txt | sort -u > unique.txt
+
+        /lib64/ld-linux-x86-64.so.2
+        libacl.so.1 => /lib64/libacl.so.1
+        libattr.so.1 => /lib64/libattr.so.1
+        libaudit.so.1 => /lib64/libaudit.so.1
+        libavahi-client.so.3 => /lib64/libavahi-client.so.3
+        libavahi-common.so.3 => /lib64/libavahi-common.so.3
+        libblkid.so.1 => /lib64/libblkid.so.1
+        libbz2.so.1 => /lib64/libbz2.so.1
+        libcap-ng.so.0 => /lib64/libcap-ng.so.0
+        libcap.so.2 => /lib64/libcap.so.2
+        libcom_err.so.2 => /lib64/libcom_err.so.2
+        libcrypto.so.10 => /lib64/libcrypto.so.10
+        libcrypt.so.1 => /lib64/libcrypt.so.1
+        libc.so.6 => /lib64/libc.so.6
+        libdbus-1.so.3 => /lib64/libdbus-1.so.3
+        libdl.so.2 => /lib64/libdl.so.2
+        libdw.so.1 => /lib64/libdw.so.1
+        libelf.so.1 => /lib64/libelf.so.1
+        libffi.so.6 => /lib64/libffi.so.6
+        libfipscheck.so.1 => /lib64/libfipscheck.so.1
+        libfreebl3.so => /lib64/libfreebl3.so
+        libgcc_s.so.1 => /lib64/libgcc_s.so.1
+        libgcrypt.so.11 => /lib64/libgcrypt.so.11
+        libgio-2.0.so.0 => /lib64/libgio-2.0.so.0
+        libglib-2.0.so.0 => /lib64/libglib-2.0.so.0
+        libgmodule-2.0.so.0 => /lib64/libgmodule-2.0.so.0
+        libgobject-2.0.so.0 => /lib64/libgobject-2.0.so.0
+        libgpg-error.so.0 => /lib64/libgpg-error.so.0
+        libgssapi_krb5.so.2 => /lib64/libgssapi_krb5.so.2
+        libidn.so.11 => /lib64/libidn.so.11
+        libk5crypto.so.3 => /lib64/libk5crypto.so.3
+        libkeyutils.so.1 => /lib64/libkeyutils.so.1
+        libkrb5.so.3 => /lib64/libkrb5.so.3
+        libkrb5support.so.0 => /lib64/libkrb5support.so.0
+        liblber-2.4.so.2 => /lib64/liblber-2.4.so.2
+        libldap-2.4.so.2 => /lib64/libldap-2.4.so.2
+        liblz4.so.1 => /lib64/liblz4.so.1
+        liblzma.so.5 => /lib64/liblzma.so.5
+        libmount.so.1 => /lib64/libmount.so.1
+        libm.so.6 => /lib64/libm.so.6
+        libnetpbm.so.11 => /lib64/libnetpbm.so.11
+        libnspr4.so => /lib64/libnspr4.so
+        libnss3.so => /lib64/libnss3.so
+        libnssutil3.so => /lib64/libnssutil3.so
+        libpcp.so.3 => /lib64/libpcp.so.3
+        libpcre.so.1 => /lib64/libpcre.so.1
+        libplc4.so => /lib64/libplc4.so
+        libplds4.so => /lib64/libplds4.so
+        libpthread.so.0 => /lib64/libpthread.so.0
+        libresolv.so.2 => /lib64/libresolv.so.2
+        librt.so.1 => /lib64/librt.so.1
+        libsasl2.so.3 => /lib64/libsasl2.so.3
+        libselinux.so.1 => /lib64/libselinux.so.1
+        libsmime3.so => /lib64/libsmime3.so
+        libssl3.so => /lib64/libssl3.so
+        libssl.so.10 => /lib64/libssl.so.10
+        libsystemd.so.0 => /lib64/libsystemd.so.0
+        libutil.so.1 => /lib64/libutil.so.1
+        libuuid.so.1 => /lib64/libuuid.so.1
+        libz.so.1 => /lib64/libz.so.1
+        linux-vdso.so.1 =>
+
+61 total unique libraries were linked once all duplicates were removed
